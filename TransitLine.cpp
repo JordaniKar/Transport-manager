@@ -85,6 +85,14 @@ void TransitLine::setEndMinute(int min) {
     }
     endMinute = min;
 }
+bool TransitLine::hasStop(const std::string& stopCode) const {
+    for (const auto& stop : stops) { 
+        if (stop.getCode() == stopCode) {
+            return true;
+        }
+    }
+    return false;
+}
 std::ostream& operator<<(std::ostream& os, const TransitLine& line) {
     os << "=== Line " << line.getLine() << " (" << line.getType() << ") ===\n";
     os << "Route:\n";

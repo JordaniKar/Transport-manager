@@ -110,6 +110,21 @@ void handleClient(SOCKET clientSocket, TransportManager* manager) {
                     response << "SUCCESS: Line " << num << " added to server database.";
                 }
             }
+            else if (request.find("APPEND_STOP ") == 0) {
+                if (!isAdmin) {
+                    response << "ERROR: Unauthorized. Admin access required.";
+                }
+                else {
+                    std::string data = request.substr(12);
+                    std::stringstream ss(data);
+                    std::string lineNum, stopCode;
+
+                    std::getline(ss, lineNum, '|');
+                    std::getline(ss, stopCode, '|');
+                    manager->addStopToLine(lineNum, stopCode);
+                    response << "SUCCESS: Stop " << stopCode << " appended to line " << lineNum << ".";
+                }
+            }
             else if (request == "SAVE") {
                 if (!isAdmin) {
                     response << "ERROR: Unauthorized.";
@@ -218,7 +233,8 @@ void runClient() {
             std::cout << "4. [Admin] Add new bus stop\n";
             std::cout << "5. [Admin] Create new transit line\n";
             std::cout << "6. [Admin] Save database to server files\n";
-            std::cout << "7. [Admin] Logout\n";
+            std::cout << "7. [Admin] Add existing stop to existing line\n";
+            std::cout << "8. [Admin] Logout\n";
         }
         std::cout << "0. Exit\n";
         std::cout << "-----------------------------------------\n";
@@ -316,8 +332,21 @@ void runClient() {
                 std::cout << "\nServer response: " << sendRequest(clientSocket, "SAVE") << "\n";
             }
             break;
-
         case 7:
+            if (isAdmin) {
+                std::string lineNum, stopCode;
+                std::cout << "\n--- ADD STOP TO LINE ---\n";
+                std::cout << "Line Number (e.g., 280): ";
+                std::cin >> lineNum;
+                std::cout << "Stop Code (e.g., S101): ";
+                std::cin >> stopCode;
+
+                std::stringstream req;
+                req << "APPEND_STOP " << lineNum << "|" << stopCode;
+                std::cout << "\nServer response: " << sendRequest(clientSocket, req.str()) << "\n";
+            }
+            break;
+        case 8:
             if (isAdmin) {
                 isAdmin = false;
                 clearScreen();

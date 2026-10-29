@@ -34,6 +34,7 @@ public:
 	void setStartMinute(int min);
 	void setEndHour(int hour);
 	void setEndMinute(int min);
+	bool hasStop(const std::string& stopCode) const;
 	friend std::ostream& operator<<(std::ostream& os, const TransitLine& line);
 };
 

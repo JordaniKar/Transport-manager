@@ -1,0 +1,12 @@
+# Visual Studio файлове
+.vs/
+*.user
+*.db
+
+# Компилирани файлове
+x64/
+Debug/
+Release/
+*.exe
+*.obj
+*.pdb

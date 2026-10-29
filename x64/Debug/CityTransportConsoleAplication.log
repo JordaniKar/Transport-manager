@@ -1,4 +1,8 @@
-﻿  main.cpp
-C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\main.cpp(137,55): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\main.cpp(180,45): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+﻿  TransitLine.cpp
+  TransportManager.cpp
+C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\TransportManager.cpp(15,22): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  main.cpp
+C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\main.cpp(152,55): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\main.cpp(195,45): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
   CityTransportConsoleAplication.vcxproj -> C:\Users\User\source\repos\CityTransportConsoleAplication\x64\Debug\CityTransportConsoleAplication.exe

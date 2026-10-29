@@ -57,6 +57,9 @@ void TransportManager::addStopToLine(const std::string& lineNum, const std::stri
     if (stops.find(stopCode) == stops.end()) {
         throw MissingDataException("stop " + stopCode);
     }
+    if (lines[lineNum].hasStop(stopCode)) {
+        throw std::invalid_argument("Stop " + stopCode + " is already in line " + lineNum);
+    }
     lines[lineNum].addStop(stops[stopCode]);
 }
 void TransportManager::printLinesForStop(const std::string& stopCode) const {
