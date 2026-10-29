@@ -1,0 +1,4 @@
+﻿  main.cpp
+C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\main.cpp(137,55): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\main.cpp(180,45): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  CityTransportConsoleAplication.vcxproj -> C:\Users\User\source\repos\CityTransportConsoleAplication\x64\Debug\CityTransportConsoleAplication.exe
