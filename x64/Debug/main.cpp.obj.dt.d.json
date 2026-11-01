@@ -369,6 +369,8 @@
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\xnode_handle.h",
             "c:\\users\\user\\source\\repos\\citytransportconsoleaplication\\citytransportconsoleaplication\\busstop.h",
             "c:\\users\\user\\source\\repos\\citytransportconsoleaplication\\citytransportconsoleaplication\\transitline.h",
+            "c:\\users\\user\\source\\repos\\citytransportconsoleaplication\\citytransportconsoleaplication\\databasemanager.h",
+            "c:\\users\\user\\source\\repos\\citytransportconsoleaplication\\citytransportconsoleaplication\\sqlite3.h",
             "c:\\users\\user\\source\\repos\\citytransportconsoleaplication\\citytransportconsoleaplication\\transportexceptions.h"
         ],
         "ImportedModules": [],

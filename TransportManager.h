@@ -3,12 +3,14 @@
 #include<unordered_map>
 #include "BusStop.h"
 #include "TransitLine.h"
+#include "DatabaseManager.h"
 class TransportManager
 {
 private:
 	std::unordered_map<std::string, BusStop> stops;
 	std::unordered_map<std::string, TransitLine> lines;
 	std::string networkName;
+	DatabaseManager db;
 
 public:
 	struct StopTimetableProxy {
@@ -30,7 +32,7 @@ public:
 		return { *this, code };
 	}
 	friend std::ostream& operator<<(std::ostream& os, const TransportManager::StopTimetableProxy& proxy);
-	void saveToCSV(const std::string& stopsFilename, const std::string& linesFilename) const;
-	void loadFromCSV(const std::string& stopsFilename, const std::string& linesFilename);
+	void loadFromDatabase();
+	void saveToDatabase();
 };
 

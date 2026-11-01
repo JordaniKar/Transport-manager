@@ -125,15 +125,7 @@ void handleClient(SOCKET clientSocket, TransportManager* manager) {
                     response << "SUCCESS: Stop " << stopCode << " appended to line " << lineNum << ".";
                 }
             }
-            else if (request == "SAVE") {
-                if (!isAdmin) {
-                    response << "ERROR: Unauthorized.";
-                }
-                else {
-                    manager->saveToCSV("stops.csv", "lines.csv");
-                    response << "SUCCESS: Database saved to server files.";
-                }
-            }
+        
             else if (request == "QUIT") {
                 break;
             }
@@ -156,13 +148,13 @@ void handleClient(SOCKET clientSocket, TransportManager* manager) {
 
 void runServer() {
     TransportManager manager;
-    try {
-        manager.loadFromCSV("stops.csv", "lines.csv");
-        std::cout << "[Server] Database loaded successfully!\n";
-    }
-    catch (...) {
-        std::cout << "[Server] Starting with empty database.\n";
-    }
+        try {
+            manager.loadFromDatabase();
+            std::cout << "[Server] Database loaded successfully!\n";
+        }
+        catch (const std::exception& e) {
+            std::cout << "[Server] Starting with empty database. Reason: " << e.what() << "\n";
+        }
 
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -232,9 +224,8 @@ void runClient() {
         else {
             std::cout << "4. [Admin] Add new bus stop\n";
             std::cout << "5. [Admin] Create new transit line\n";
-            std::cout << "6. [Admin] Save database to server files\n";
-            std::cout << "7. [Admin] Add existing stop to existing line\n";
-            std::cout << "8. [Admin] Logout\n";
+            std::cout << "6. [Admin] Add existing stop to existing line\n";
+            std::cout << "7. [Admin] Logout\n";
         }
         std::cout << "0. Exit\n";
         std::cout << "-----------------------------------------\n";
@@ -326,13 +317,7 @@ void runClient() {
                 std::cout << "\nServer response: " << sendRequest(clientSocket, req.str()) << "\n";
             }
             break;
-
         case 6:
-            if (isAdmin) {
-                std::cout << "\nServer response: " << sendRequest(clientSocket, "SAVE") << "\n";
-            }
-            break;
-        case 7:
             if (isAdmin) {
                 std::string lineNum, stopCode;
                 std::cout << "\n--- ADD STOP TO LINE ---\n";
@@ -346,7 +331,7 @@ void runClient() {
                 std::cout << "\nServer response: " << sendRequest(clientSocket, req.str()) << "\n";
             }
             break;
-        case 8:
+        case 7:
             if (isAdmin) {
                 isAdmin = false;
                 clearScreen();

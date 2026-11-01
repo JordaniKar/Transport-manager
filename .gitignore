@@ -10,3 +10,4 @@ Release/
 *.exe
 *.obj
 *.pdb
+build/

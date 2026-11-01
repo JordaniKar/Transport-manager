@@ -7,9 +7,11 @@
 #include <sstream>
 TransportManager::TransportManager() {
     networkName = "";
+    db.initialize();
 }
 TransportManager::TransportManager(std::string name) {
     networkName = name;
+    db.initialize();
 }
 int TransportManager::getStopsCount() const {
     return stops.size(); 
@@ -37,20 +39,44 @@ void TransportManager::addStop(const BusStop& stop) {
     if (stops.find(stop.getCode()) != stops.end()) {
         throw DuplicateStopException(stop.getCode());
     }
-    stops[stop.getCode()] = stop;
-}
 
+    stops[stop.getCode()] = stop;
+    std::stringstream ss;
+    ss << "INSERT INTO Stops (code, name, address, lat, lon) VALUES ('"
+        << stop.getCode() << "', '" << stop.getName() << "', '"
+        << stop.getAddress() << "', " << stop.getLatitude() << ", " << stop.getLongitude() << ");";
+
+    db.executeQuery(ss.str());
+}
 void TransportManager::addLine(const TransitLine& line) {
     if (line.getLine() == "") {
         throw TransportException("Error: Empty parameters!");
     }
     if (lines.find(line.getLine()) != lines.end()) {
-        
-        throw TransportException("Error: The line " + line.getLine() + " already exists!");
+        throw TransportException("Error: A line with the number: " + line.getLine() + " already exists!");
     }
+
     lines[line.getLine()] = line;
+    std::stringstream ss;
+    ss << "INSERT INTO Lines (number, type, interval, start_h, start_m, end_h, end_m) VALUES ('"
+        << line.getLine() << "', '" << line.getType() << "', "
+        << line.getInterval() << ", " << line.getStartHour() << ", "
+        << line.getStartMinute() << ", " << line.getEndHour() << ", "
+        << line.getEndMinute() << ");";
+    db.executeQuery(ss.str());
+
+    const auto& route = line.getStops();
+    for (size_t i = 0; i < route.size(); ++i) {
+        std::stringstream rss;
+        rss << "INSERT INTO RouteStops (line_number, stop_code, stop_order) VALUES ('"
+            << line.getLine() << "', '" << route[i].getCode() << "', " << (i + 1) << ");";
+        db.executeQuery(rss.str());
+    }
 }
 void TransportManager::addStopToLine(const std::string& lineNum, const std::string& stopCode) {
+    if (lineNum == "" || stopCode == "") {
+        throw TransportException("Error: Empty parameters!");
+    }
     if (lines.find(lineNum) == lines.end()) {
         throw MissingDataException("line " + lineNum);
     }
@@ -58,9 +84,15 @@ void TransportManager::addStopToLine(const std::string& lineNum, const std::stri
         throw MissingDataException("stop " + stopCode);
     }
     if (lines[lineNum].hasStop(stopCode)) {
-        throw std::invalid_argument("Stop " + stopCode + " is already in line " + lineNum);
+        throw TransportException("Error: Stop " + stopCode + " is already in line " + lineNum);
     }
     lines[lineNum].addStop(stops[stopCode]);
+
+    int newOrder = lines[lineNum].getStops().size();
+    std::stringstream ss;
+    ss << "INSERT INTO RouteStops (line_number, stop_code, stop_order) VALUES ('"
+        << lineNum << "', '" << stopCode << "', " << newOrder << ");";
+    db.executeQuery(ss.str());
 }
 void TransportManager::printLinesForStop(const std::string& stopCode) const {
     if (stops.find(stopCode) == stops.end()) {
@@ -164,79 +196,39 @@ std::ostream& operator<<(std::ostream& os, const TransportManager::StopTimetable
     return os;
 }
 
-void TransportManager::saveToCSV(const std::string& stopsFilename, const std::string& linesFilename) const {
-    std::ofstream stopsFile(stopsFilename);
-    if (!stopsFile) throw TransportException("Error: Could not create stops file!");
-    for (const auto& pair : stops) {
-        stopsFile << pair.second.getCode() << ","
-            << pair.second.getName() << ","
-            << pair.second.getAddress() << ","
-            << pair.second.getLatitude() << ","
-            << pair.second.getLongitude() << "\n";
+void TransportManager::loadFromDatabase() {
+    auto stopRows = db.selectQuery("SELECT * FROM Stops;");
+    for (const auto& row : stopRows) {
+        BusStop stop(
+            row.at("code"),
+            row.at("name"),
+            row.at("address"),
+            std::stod(row.at("lat")),
+            std::stod(row.at("lon"))
+        );
+        stops[stop.getCode()] = stop;
     }
-    stopsFile.close();
 
-    std::ofstream linesFile(linesFilename);
-    if (!linesFile) throw TransportException("Error: Could not create lines file!");
-
-    for (const auto& pair : lines) {
-        const TransitLine& line = pair.second;
-        linesFile << line.getLine() << "," << line.getType() << ","
-            << line.getInterval() << "," << line.getStartHour() << ","
-            << line.getStartMinute() << "," << line.getEndHour() << ","
-            << line.getEndMinute();
-        for (const auto& stop : line.getStops()) {
-            linesFile << "," << stop.getCode();
-        }
-        linesFile << "\n";
+    auto lineRows = db.selectQuery("SELECT * FROM Lines;");
+    for (const auto& row : lineRows) {
+        TransitLine line(
+            row.at("number"),
+            row.at("type"),
+            std::stoi(row.at("interval")),
+            std::stoi(row.at("start_h")),
+            std::stoi(row.at("start_m")),
+            std::stoi(row.at("end_h")),
+            std::stoi(row.at("end_m"))
+        );
+        lines[line.getLine()] = line;
     }
-    linesFile.close();
-}
 
-void TransportManager::loadFromCSV(const std::string& stopsFilename, const std::string& linesFilename) {
-    std::ifstream stopsFile(stopsFilename);
-    if (stopsFile) {
-        std::string lineStr;
-        while (std::getline(stopsFile, lineStr)) {
-            std::stringstream ss(lineStr);
-            std::string code, name, address, latStr, lonStr;
-            std::getline(ss, code, ',');
-            std::getline(ss, name, ',');
-            std::getline(ss, address, ',');
-            std::getline(ss, latStr, ',');
-            std::getline(ss, lonStr, ',');
-
-            if (!code.empty()) {
-                double lat = std::stod(latStr);
-                double lon = std::stod(lonStr);
-                addStop(BusStop(code, name, address, lat, lon));
-            }
+    auto routeRows = db.selectQuery("SELECT * FROM RouteStops ORDER BY line_number, stop_order ASC;");
+    for (const auto& row : routeRows) {
+        std::string lineNum = row.at("line_number");
+        std::string stopCode = row.at("stop_code");
+        if (lines.find(lineNum) != lines.end() && stops.find(stopCode) != stops.end()) {
+            lines[lineNum].addStop(stops[stopCode]);
         }
-    }
-    stopsFile.close();
-
-    std::ifstream linesFile(linesFilename);
-    if (linesFile) {
-        std::string lineStr;
-        while (std::getline(linesFile, lineStr)) {
-            std::stringstream ss(lineStr);
-            std::string num, type, intervalStr, sH, sM, eH, eM, stopCode;
-            std::getline(ss, num, ',');
-            std::getline(ss, type, ',');
-            std::getline(ss, intervalStr, ',');
-            std::getline(ss, sH, ','); std::getline(ss, sM, ',');
-            std::getline(ss, eH, ','); std::getline(ss, eM, ',');
-
-            if (num.empty()) continue;
-            TransitLine newLine(num, type, std::stoi(intervalStr),
-                std::stoi(sH), std::stoi(sM),
-                std::stoi(eH), std::stoi(eM));
-
-            while (std::getline(ss, stopCode, ',')) {
-                newLine.addStop(stops.at(stopCode));
-            }
-            addLine(newLine);
-        }
-        linesFile.close();
     }
 }

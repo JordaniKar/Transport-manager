@@ -141,13 +141,17 @@
   <ItemGroup>
     <ClCompile Include="BusStop.cpp" />
     <ClCompile Include="CityTransportConsoleAplication.cpp" />
+    <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="sqlite3.c" />
     <ClCompile Include="TransitLine.cpp" />
     <ClCompile Include="TransportExceptions.cpp" />
     <ClCompile Include="TransportManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BusStop.h" />
+    <ClInclude Include="DatabaseManager.h" />
+    <ClInclude Include="sqlite3.h" />
     <ClInclude Include="TransitLine.h" />
     <ClInclude Include="TransportExceptions.h" />
     <ClInclude Include="TransportManager.h" />
