@@ -1,9 +1,0 @@
-﻿  DatabaseManager.cpp
-  TransportManager.cpp
-C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\TransportManager.cpp(17,22): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\TransportManager.cpp(91,18): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-  main.cpp
-C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\main.cpp(144,55): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\User\source\repos\CityTransportConsoleAplication\CityTransportConsoleAplication\main.cpp(187,45): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-  Generating Code...
-  CityTransportConsoleAplication.vcxproj -> C:\Users\User\source\repos\CityTransportConsoleAplication\x64\Debug\CityTransportConsoleAplication.exe
